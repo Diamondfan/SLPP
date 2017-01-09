@@ -7,9 +7,9 @@ import LPP
 import datetime
 import random
 
-k_hood=250
+k_hood=350
 dim=39
-frame=200
+frame=100
 frame_num=198*frame
 
 start=datetime.datetime.now()
@@ -55,7 +55,7 @@ D,beta=LPP.calulateDistance(data,frame_num)
 #beta=6051.48990544
 #print(D)
 print("开始进行监督学习")
-D=LPP.supervisedLearningA(D,beta,frame_num,k_hood,label)
+D=LPP.traditionalLPP(D,beta,frame_num,k_hood)
 print("监督学习完毕，开始计算alpha")
 alpha=LPP.calulateAlpha(D,data,frame_num)
 alpha=alpha.T
