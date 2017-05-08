@@ -56,12 +56,12 @@ def traditionalLPP(data,frame_num,k_hood,beta):
     nbrs=NearestNeighbors(n_neighbors=k_hood,algorithm='ball_tree').fit(data)
     distance,indices=nbrs.kneighbors(data)
     for i in range(frame_num):
-        avr=distance[i].mean()
+        #avr=distance[i].mean()
         for j in range(k_hood):
             index=indices[i][j]
             dis=distance[i][j]
-            D[i,index]=math.exp(-dis**2/(beta*avr*avr))
-        print(i,dis)
+            D[i,index]=math.exp(-dis**2/(beta))
+        #print(i,dis)
     #转化为对称矩阵
     DT=D.transpose()
     D=lil_matrix.maximum(D,DT)
@@ -92,13 +92,35 @@ def calulateAlpha(D,data,frame_num,ndim,ldim):
     for i in range(len(value)):
         VA[value[i]]=alpha[:,i]
     value_sort=sorted(VA)
-    print(value_sort)
+    print(value_sort[i])
     arr=np.zeros(ndim*ldim).reshape(ndim,ldim)
     #print("arr:",arr)
     for i in range(ldim):
         arr[:,i]=VA[value_sort[i]]
     return arr
     #alpha=np.arange(25).reshape(5,5)
+
+def cal_sub_alpha(LMatrix,RMatrix,ndim,ldim):
+    LMatrix=csc_matrix.maximum(LMatrix,LMatrix.transpose())
+    RMatrix=csc_matrix.maximum(RMatrix,RMatrix.transpose())
+    finalMatrix=linalg.inv(LMatrix)*RMatrix
+    finalMatrix=finalMatrix.toarray()
+    value,alpha=np.linalg.eig(finalMatrix)
+    VA=dict()
+    print("特征值个数为:"+str(len(value)))
+    for i in range(len(value)):
+        VA[value[i]]=alpha[:,i]
+    value_sort=sorted(VA)
+    for i in range(len(value_sort)):
+        if value_sort[i]>=0:
+            loc=i
+            break
+    print(value_sort[loc:])
+    arr=np.zeros(ndim*ldim).reshape(ndim,ldim)
+    #print("arr:",arr)
+    for i in range(ldim):
+        arr[:,i]=VA[value_sort[loc+i]]
+    return arr
 
 def supervisedLearningA(D,beta,frame_num,k_hood,label):    
     #sum_cal_t=0
